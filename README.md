@@ -1,5 +1,5 @@
-# ScumDB
-ScumDB is a tool for managing database changes through your source code version control system.
+# SqlSCM
+SqlSCM is a tool for managing database changes through your source code version control system.
 
 It's a bit like a migration frame work, however:
 
@@ -12,29 +12,29 @@ It's a bit like a migration frame work, however:
 ### Installation
 
 ```
-npm install scumdb --save-dev
+npm install sqlscm --save-dev
 ```
 or
 ```
-npm install scumdb --global
+npm install sqlscm --global
 ```
 
-### Initialise scum
+### Initialise sqlscm
 ```
-scum init
+sqlscm init
 > Conection string lookup method - requires sa or ddladmin rights? (env)
-> Connection string environment variable? (scumconnection)
+> Connection string environment variable? (sqlscmconnection)
 > Directory to store database changes in? (./Database)
 > Directory does not exist - create? (y)
 > Pattern to match Stored Procedures (./Database/StoredProcedures/*.sql)
 > Creating database structure and saving initial version [done]
-> settings saved to scum.json [done]
+> settings saved to sqlscm.json [done]
 ```
 
 ### Create a new change/migration
 
 ```
-scum create [changename]
+sqlscm create [changename]
 ```
 
 This will create 2 new files: 
@@ -48,7 +48,7 @@ and commit them to source control
 ### Apply outstanding changes
 
 ```
-scum update
+sqlscm update
 > current database version: 0
 > preparing update to version: 1
 > found: 1 change to upgrade: changename-up.sql 
@@ -61,7 +61,7 @@ scum update
 ### Apply a specific version
 ```
 hg update 0
-scum update
+sqlscm update
 > current database version: 1
 > preparing update to version: 0
 > found: 0 changes to upgrade. 
@@ -75,9 +75,9 @@ scum update
 
 You may want to view the script before running - you can view that with:
 ```
-scum script
+sqlscm script
 ```
 
 Sometimes, for a particular migration you'll need to run UDF changes before DDL changes, other times you'll know you need them
 to run afterwards. to do this, just name your migration with a suffix of -before or -after.
-Before is the default, but this can be changed globally in scum.json
+Before is the default, but this can be changed globally in sqlscm.json
