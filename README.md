@@ -1,5 +1,6 @@
 # SqlSCM
 SqlSCM is a tool for managing database changes through your source code version control system.
+
 **nb** this is only a super early prototype, the rest of the readme is where I aim to get the project.
 very few of the below features are currently implemented and all of them are buggy
 
