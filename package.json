@@ -4,8 +4,8 @@
   "description": "A migrations-like tool for managing database changes through source control",
   "main": "index.js",
   "repository": {
-    "type" : "git"
-  , "url" : "https://github.com/rdsimes/sqlscm.git"
+    "type": "git",
+    "url": "https://github.com/rdsimes/sqlscm.git"
   },
   "scripts": {
     "test": "mocha"
@@ -15,6 +15,7 @@
   "dependencies": {
     "async": "^2.1.2",
     "hg": "^0.2.0",
+    "readline": "^1.3.0",
     "sqlite3": "^3.1.4"
   },
   "devDependencies": {
