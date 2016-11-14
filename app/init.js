@@ -5,6 +5,11 @@ var readline = require('readline');
 
 var config;
 var options;
+
+const input = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
     
 var detectGit = function(callback){
     exec("git rev-parse --is-inside-work-tree", options, (error, stdout, stderr) => {
@@ -39,16 +44,12 @@ var getConfig = function(configFinders, cwd, cb){
     configFinders = configFinders || silentConfigFinders;
     config = {}; //reset config
     options = {};
-    
+
     if (cwd){
         options.cwd = cwd;
     }
-
-    const input = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout
-    });
-
+/*
+  */
 
     parallel(configFinders, (error, results) => {
         cb(null, config)
@@ -57,8 +58,10 @@ var getConfig = function(configFinders, cwd, cb){
 
 
 var init = function(){
-    var config = getConfig(silentConfigFinders.concat(interactiveConfigFinders));
-    //save it too
+    return getConfig(silentConfigFinders.concat(interactiveConfigFinders), null, (error, data) => {
+       console.log(data);
+       input.close();
+   });
 }
 
 module.exports = {
