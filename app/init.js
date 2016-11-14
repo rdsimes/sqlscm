@@ -1,7 +1,8 @@
 var exec = require('child_process').exec;
 var process = require('process');
-var parallel = require('async/parallel');
+var series = require('async/series');
 var readline = require('readline');
+var fs = require('fs');
 
 var config;
 var options;
@@ -14,6 +15,7 @@ const input = readline.createInterface({
 var detectGit = function(callback){
     exec("git rev-parse --is-inside-work-tree", options, (error, stdout, stderr) => {
         if(stdout == "true\n"){
+            console.log("\nDetected git repository, setting mode to: git\n")
             config.mode = "git";
         }
         callback();
@@ -48,18 +50,20 @@ var getConfig = function(configFinders, cwd, cb){
     if (cwd){
         options.cwd = cwd;
     }
-/*
-  */
-
-    parallel(configFinders, (error, results) => {
+    //parallel would sort-of-work, but confuses interactive input/output
+    series(configFinders, (error, results) => {
         cb(null, config)
     });
 }
 
 
 var init = function(){
-    return getConfig(silentConfigFinders.concat(interactiveConfigFinders), null, (error, data) => {
-       console.log(data);
+    console.log("Configuring for database changes")
+    getConfig(silentConfigFinders.concat(interactiveConfigFinders), null, (error, data) => {
+       //console.log(data);
+       var fileName = 'sqlscm.json';
+       console.log('Saving config to: ' + fileName);
+       fs.writeFile(fileName, JSON.stringify(data));
        input.close();
    });
 }
