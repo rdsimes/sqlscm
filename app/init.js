@@ -31,16 +31,31 @@ var detectHg = function(callback){
     });
 };
 
+var calculateDbCmd = function(callback){
+    if (config.db == "sqlite" && config.connection){
+        config.dbcmd = "sqlite3 " + config.connection + " ";
+    }
+    callback();
+}
+
 var requestDbType = (callback) => {
-    input.question('Database?[sqlserver|sqlite]', (answer) => {
+    input.question('Database?[sqlserver|sqlite] ', (answer) => {
         config.db = answer;
         callback();
     });
 };
 
+var requestDbConnection = (callback) => {
+    input.question('Connection string? ', (answer) => {
+        config.connection = answer;
+        callback();
+    });
+};
 
-var silentConfigFinders = [detectHg, detectGit];
-var interactiveConfigFinders = [requestDbType];
+
+
+var silentConfigFinders = [detectHg, detectGit, calculateDbCmd];
+var interactiveConfigFinders = [requestDbType, requestDbConnection];
 
 var getConfig = function(configFinders, cwd, cb){
     configFinders = configFinders || silentConfigFinders;
@@ -59,12 +74,13 @@ var getConfig = function(configFinders, cwd, cb){
 
 var init = function(){
     console.log("Configuring for database changes")
-    getConfig(silentConfigFinders.concat(interactiveConfigFinders), null, (error, data) => {
-       //console.log(data);
-       var fileName = 'sqlscm.json';
-       console.log('Saving config to: ' + fileName);
-       fs.writeFile(fileName, JSON.stringify(data));
-       input.close();
+    getConfig(interactiveConfigFinders.concat(silentConfigFinders), null, (error, data) => {
+        
+        //console.log(data);
+        var fileName = 'sqlscm.json';
+        console.log('Saving config to: ' + fileName);
+        fs.writeFile(fileName, JSON.stringify(data));
+        input.close();
    });
 }
 

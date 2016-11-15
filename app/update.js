@@ -2,9 +2,11 @@ var exec = require('child_process').exec;
 var fs = require('fs');
 //var sqlite3 = require('sqlite3');
 var series = require('async/series');
-var db = require('./db');
+var dbfactory = require('./db');
 
-var mode = 'git'; // or 'hg'
+module.exports = function(config){
+
+var db = dbfactory(config);
 
 function findChanges(diffSummary){
     var dbChanges = diffSummary
@@ -52,9 +54,9 @@ function findCurrentRevision (cb){
 }
 
 function findTargetRevision(cb){
-    var cmd = mode == "git" ? "git rev-parse --short HEAD" : "hg parent";
+    var cmd = config.mode == "git" ? "git rev-parse --short HEAD" : "hg parent";
     return exec(cmd, (error, stdout, stderr) => {   
-        var revision = mode == "git" ?
+        var revision = config.mode == "git" ?
         stdout.trim() 
         :stdout.split("\n")[0].split(":")[2];
         return cb(null, revision);
@@ -62,11 +64,11 @@ function findTargetRevision(cb){
 }
 
 var update = function(sourceRevision, targetRevision){
-    if (mode == "git" && sourceRevision == 0){
+    if (config.mode == "git" && sourceRevision == 0){
         sourceRevision = "HEAD";
     }
     console.log("upgrade from revision:" + sourceRevision + " to " + targetRevision);
-    var cmd = mode == "git" ? 
+    var cmd = config.mode == "git" ? 
     "git diff --stat " + sourceRevision + " " + targetRevision
     : 'hg diff --stat -r ' + sourceRevision + ":" + targetRevision;
     exec(cmd, function(error, stdout, stderr) {
@@ -94,13 +96,13 @@ var update = function(sourceRevision, targetRevision){
 };
 
 var findFirstRevision = function(cb){
-    if (mode == 'hg'){
+    if (config.mode == 'hg'){
         return cb(null, 0);
     }
     return exec("git rev-list --max-parents=0 HEAD", cb);
 };
 
-module.exports = function(){
+
     series([findCurrentRevision, findTargetRevision, findFirstRevision], function (err, results){
         current = results[0];
         target = results[1];
