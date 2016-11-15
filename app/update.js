@@ -99,25 +99,27 @@ var findFirstRevision = function(cb){
     if (config.mode == 'hg'){
         return cb(null, 0);
     }
-    return exec("git rev-list --max-parents=0 HEAD", cb);
+    exec("git rev-list --max-parents=0 HEAD", (error, stdout, stderr) => {
+        return cb(null, stdout.trim()); 
+    });
 };
 
 
-    series([findCurrentRevision, findTargetRevision, findFirstRevision], function (err, results){
-        current = results[0];
-        target = results[1];
-        first = results[2];
-        
-        if (current){
-            current = current.revision;
-        } else {
-            current = first;
-        } 
+series([findCurrentRevision, findTargetRevision, findFirstRevision], function (err, results){
+    current = results[0];
+    target = results[1];
+    first = results[2];
+    
+    if (current){
+        current = current.revision;
+    } else {
+        current = first;
+    } 
 
-        if (err){
-            console.log(err);
-            return;
-        }
-        update(current, target);
-    });
+    if (err){
+        console.log(err);
+        return;
+    }
+    update(current, target);
+});
 };
