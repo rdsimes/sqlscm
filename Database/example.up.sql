@@ -1,3 +1,1 @@
-create table example(
-    name varchar(40)
-);
+create table example(name varchar(40));
