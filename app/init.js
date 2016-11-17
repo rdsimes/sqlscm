@@ -3,6 +3,7 @@ var process = require('process');
 var series = require('async/series');
 var readline = require('readline');
 var fs = require('fs');
+var db = require('./db');
 
 var config;
 var options;
@@ -53,6 +54,10 @@ var requestDbConnection = (callback) => {
 };
 
 
+function createHistoryTable(con, cb){
+    con.exec("create table __ScumHistory(filePath varchar(2000), revision varchar (30),  timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)", cb);
+}
+
 
 var silentConfigFinders = [detectHg, detectGit, calculateDbCmd];
 var interactiveConfigFinders = [requestDbType, requestDbConnection];
@@ -75,7 +80,8 @@ var getConfig = function(configFinders, cwd, cb){
 var init = function(){
     console.log("Configuring for database changes")
     getConfig(interactiveConfigFinders.concat(silentConfigFinders), null, (error, data) => {
-        
+        //set up db
+        createHistoryTable(db(data), console.log);
         //console.log(data);
         var fileName = 'sqlscm.json';
         console.log('Saving config to: ' + fileName);

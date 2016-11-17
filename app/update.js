@@ -40,10 +40,14 @@ function runChanges(downgrades, upgrades, sourceRevision, targetRevision){
     upgrades.forEach((u) => fs.readFile(u.filePath, 'utf8', function(err, data) {
         if (err) throw err;
         console.log("Running: " + u.filePath);
-        db.exec(data);
-        db.run("INSERT INTO __ScumHistory(filePath, revision) values(?, ?)", [u.filePath, targetRevision]);
+        db.exec(data, console.log);
+        logRevision(u.filePath, targetRevision, console.log);
         console.log("Done");
     }));
+}
+
+function logRevision(filePath, revision, callback){
+    db.exec("INSERT INTO __ScumHistory(filePath, revision) values('" + filePath + "','" + revision + "')", callback);
 }
 
 function findCurrentRevision (cb){
@@ -64,9 +68,7 @@ function findTargetRevision(cb){
 }
 
 var update = function(sourceRevision, targetRevision){
-    if (config.mode == "git" && sourceRevision == 0){
-        sourceRevision = "HEAD";
-    }
+  
     console.log("upgrade from revision:" + sourceRevision + " to " + targetRevision);
     var cmd = config.mode == "git" ? 
     "git diff --stat " + sourceRevision + " " + targetRevision
@@ -106,14 +108,13 @@ var findFirstRevision = function(cb){
 
 
 series([findCurrentRevision, findTargetRevision, findFirstRevision], function (err, results){
-    current = results[0];
-    target = results[1];
-    first = results[2];
+    var current = results[0];
+    var target = results[1];
+    var first = results[2];
     
-    if (current){
-        current = current.revision;
-    } else {
+    if (!current){
         current = first;
+        logRevision('initial revision - (n/a)', current, console.log);
     } 
 
     if (err){
