@@ -41,8 +41,9 @@ function runChanges(downgrades, upgrades, sourceRevision, targetRevision){
         console.log("Running: " + u.filePath);          
         db.execFile(u.filePath, (err, result) => {
             if(err){
-                console.log(err);
-                return;
+                console.error(err);
+                console.error("No changes made, but saving current revision");
+                //return;
             }
             logRevision(u.filePath, targetRevision, console.log);
             console.log("Done");
