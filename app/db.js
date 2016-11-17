@@ -20,8 +20,18 @@ module.exports = (config) => {
         });
     }
 
+    var execFile = function(filePath, cb){
+        var cmd = config.dbcmd + ' < ' + filePath;
+        console.log(cmd);
+        execProcess(cmd, (error, stdout, stderr) => {   
+            cb(error, stdout);
+        });
+        
+    }
+
     return {
         get:get,
-        exec:exec
+        exec:exec,
+        execFile:execFile
     }
 };

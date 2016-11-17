@@ -37,13 +37,17 @@ function matchDbChangeInSummary(diffSummaryLine){
 function runChanges(downgrades, upgrades, sourceRevision, targetRevision){
     //todo, downgrades need to check out the file in the source revision, while upgrades can use the target or working revision
 
-    upgrades.forEach((u) => fs.readFile(u.filePath, 'utf8', function(err, data) {
-        if (err) throw err;
-        console.log("Running: " + u.filePath);
-        db.exec(data, console.log);
-        logRevision(u.filePath, targetRevision, console.log);
-        console.log("Done");
-    }));
+    upgrades.forEach((u) => {
+        console.log("Running: " + u.filePath);          
+        db.execFile(u.filePath, (err, result) => {
+            if(err){
+                console.log(err);
+                return;
+            }
+            logRevision(u.filePath, targetRevision, console.log);
+            console.log("Done");
+        });
+    });
 }
 
 function logRevision(filePath, revision, callback){
