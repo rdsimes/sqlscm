@@ -1,4 +1,6 @@
 var exec = require('child_process').exec;
+var series = require('async/series');
+
 
 function findCurrentRevision (db, cb){
     return db.get("select revision from __SqlscmHistory order by timestamp desc limit 1", function(err, result){
@@ -32,12 +34,24 @@ function diff(sourceRevision, targetRevision, config, cb){
     : 'hg diff --stat -r ' + sourceRevision + ":" + targetRevision;
 
     exec(cmd, cb);
-        
 }
+
+function all(db, config, callback){
+    series([(cb) => findCurrentRevision(db, cb), 
+            (cb) => findTargetRevision(config, cb), 
+            (cb) => findFirstRevision(config, cb)], (err, results) => {
+                var current = results[0];
+                var target = results[1];
+                var first = results[2];
+                callback(err, {current: current, target: target, first:first});
+            });
+}
+
 
 module.exports = {
     current: findCurrentRevision,
     target: findTargetRevision,
     first: findFirstRevision,
+    all: all,
     diff: diff
 };

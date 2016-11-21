@@ -1,5 +1,4 @@
 var fs = require('fs');
-var series = require('async/series');
 var os = require('os');
 var dbfactory = require('./db'),
     revisions = require('./revisions'),
@@ -40,23 +39,17 @@ module.exports = function(config, callback){
             cb(null, sql);            
         });
     };
-
-    series([(cb) => revisions.current(db, cb), 
-            (cb) => revisions.target(config, cb), 
-            (cb) => revisions.first(config, cb)], function (err, results){
-        var current = results[0];
-        var target = results[1];
-        var first = results[2];
+    revisions.all(db, config, (err, revs) => {
         
-        if (!current){
-            current = first;
-            logRevision('initial revision - (n/a)', current, console.log);
+        if (!revs.current){
+            revs.current = revs.first;
+            logRevision('initial revision - (n/a)', revs.current);
         } 
 
         if (err){
             console.log(err);
             return;
         }
-        createUpdateScript(current, target, callback);
+        createUpdateScript(revs.current, revs.target, callback);
     });
 };
