@@ -55,7 +55,7 @@ var requestDbConnection = (callback) => {
 
 
 function createHistoryTable(con, cb){
-    con.exec("create table __ScumHistory(filePath varchar(2000), revision varchar (30),  timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)", cb);
+    con.exec("create table __SqlscmHistory(filePath varchar(2000), revision varchar (30),  timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)", cb);
 }
 
 

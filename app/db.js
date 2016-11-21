@@ -5,7 +5,6 @@ module.exports = (config) => {
 
     var get = function(sql, cb){
         var cmd = config.dbcmd + '"' + sql + '"';
-        console.log(cmd);
         execProcess(cmd, (error, stdout, stderr) => {   
             cb(error, stdout.trim());
         });
@@ -14,7 +13,6 @@ module.exports = (config) => {
 
     var exec = function(sql, cb){
         var cmd = config.dbcmd + '"' + sql + '"';
-        console.log(cmd);
         execProcess(cmd, (error, stdout, stderr) => {   
             cb(error, stdout);
         });
@@ -22,7 +20,6 @@ module.exports = (config) => {
 
     var execFile = function(filePath, cb){
         var cmd = config.dbcmd + ' < ' + filePath;
-        console.log(cmd);
         execProcess(cmd, (error, stdout, stderr) => {   
             cb(error, stdout);
         });

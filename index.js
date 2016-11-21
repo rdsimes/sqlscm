@@ -1,8 +1,9 @@
 var yargs = require('yargs');
 var fs = require('fs');
 
-var update = require('./app/update');
-var init = require('./app/init');
+var update = require('./app/update'),
+    init = require('./app/init'),
+    script = require('./app/script');
 
 fs.readFile('sqlscm.json', (err, data) => {
     var config;
@@ -18,7 +19,7 @@ fs.readFile('sqlscm.json', (err, data) => {
             init.init();
         })
         .command('script', 'Show script to update database', function (argv) {        
-            update(config);//todo
+            script(config, (err, sql) => {console.log(sql)});
         })
         .command('update', 'Update database', function (argv) {        
             update(config);

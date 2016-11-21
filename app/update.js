@@ -52,11 +52,11 @@ function runChanges(downgrades, upgrades, sourceRevision, targetRevision){
 }
 
 function logRevision(filePath, revision, callback){
-    db.exec("INSERT INTO __ScumHistory(filePath, revision) values('" + filePath + "','" + revision + "')", callback);
+    db.exec("INSERT INTO __SqlscmHistory(filePath, revision) values('" + filePath + "','" + revision + "')", callback);
 }
 
 function findCurrentRevision (cb){
-   return db.get("select revision from __ScumHistory order by timestamp desc limit 1", function(err, result){
+   return db.get("select revision from __SqlscmHistory order by timestamp desc limit 1", function(err, result){
         if(err) return cb(null, null);
         return cb(err, result);
     });
